@@ -49,6 +49,8 @@ SessionStart Hook 在每个会话开始或恢复时注入项目级 Memory 协议
 
 Stop Hook 会在首次遗漏 Recall/Retro 记录时要求 Agent 继续处理。为防止无限循环，第二次仍遗漏时只告警并放行。宿主还可能禁用 Hook、拒绝信任项目配置或直接绕过协议，因此这套机制是强工作流约束，不是不可绕过的安全控制。真正的强制治理应在后续 Harness 阶段由机械门禁承担。
 
+Codex Stop 使用宿主要求的 JSON continuation 协议（`decision: block`）；Claude Stop 使用退出码 2 与 stderr。两个适配共享同一生命周期状态，但保持各自宿主的 Hook 输出格式。
+
 首次在 Codex 或 Claude 打开项目时，需要人工审阅并信任项目配置与命令 Hook。`ms init` 不会替用户修改全局信任列表；未信任时，实例仍存在，但宿主不会自动加载这些本地约束。
 
 ## 数据规则

@@ -47,6 +47,31 @@ test("init is idempotent and status discovers the instance", async () => {
   assert.match(captured.stdout(), /Instance:/);
 });
 
+test("init refreshes a formatter-rewritten Codex lifecycle bridge", async () => {
+  const project = mkdtempSync(join(tmpdir(), "ms-project-"));
+  assert.equal(await main(["init", project], capture().io), 0);
+  const bridge = join(project, ".codex", "config.toml");
+  writeFileSync(bridge, `
+[mcp_servers.memex]
+command = "ms"
+args = ["memory", "--project", '${project.replaceAll("\\", "\\\\")}', "mcp"]
+
+[[hooks.SessionStart.hooks]]
+command = "ms lifecycle hook session-start --agent codex"
+[[hooks.UserPromptSubmit.hooks]]
+command = "ms lifecycle hook user-prompt --agent codex"
+[[hooks.Stop.hooks]]
+command = "ms lifecycle hook stop --agent codex"
+`, "utf8");
+
+  assert.equal(await main(["init", project], capture().io), 0);
+  assert.equal(
+    readFileSync(bridge, "utf8"),
+    readFileSync(join(project, ".multi-silicon", "integrations", "codex", "config.toml"), "utf8"),
+  );
+  assert.doesNotMatch(readFileSync(bridge, "utf8"), /mcp_servers\.memex\]/);
+});
+
 test("init excludes an instance nested below the Git root", async () => {
   const repository = mkdtempSync(join(tmpdir(), "ms-repository-"));
   const project = join(repository, "packages", "application");
@@ -132,7 +157,10 @@ test("lifecycle hooks surface Recall and gate a missing Retro once", async () =>
   assert.equal(await main([
     "lifecycle", "hook", "stop", "--agent", "codex", "--project", project,
   ], firstStop.io), 0);
-  assert.match(firstStop.stdout(), /Retro decision is missing/);
+  assert.deepEqual(JSON.parse(firstStop.stdout()), {
+    decision: "block",
+    reason: `Multi-Silicon completion gate: Retro decision is missing for session ${sessionId}. Complete the lifecycle commands shown at SessionStart, then finish the response.`,
+  });
 
   assert.equal(await main([
     "lifecycle", "retro", "--project", project, "--session", sessionId,
@@ -152,7 +180,10 @@ test("lifecycle hooks surface Recall and gate a missing Retro once", async () =>
   assert.equal(await main([
     "lifecycle", "hook", "stop", "--agent", "codex", "--project", project,
   ], nextStop.io), 0);
-  assert.match(nextStop.stdout(), /Recall decision and Retro decision is missing/);
+  assert.deepEqual(JSON.parse(nextStop.stdout()), {
+    decision: "block",
+    reason: `Multi-Silicon completion gate: Recall decision and Retro decision is missing for session ${sessionId}. Complete the lifecycle commands shown at SessionStart, then finish the response.`,
+  });
 });
 
 test("Retro create and update require a declared read-back verification", async () => {
