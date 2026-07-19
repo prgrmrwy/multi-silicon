@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdirSync, mkdtempSync, readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -56,4 +56,22 @@ test("recall and retro are not presented as native Memex commands", async () => 
   const captured = capture();
   assert.equal(await main(["memory", "recall"], captured.io), 1);
   assert.match(captured.stderr(), /Agent lifecycle operation/);
+});
+
+test("doctor accepts an explicit Memex provider", async () => {
+  const project = mkdtempSync(join(tmpdir(), "ms-project-"));
+  const fakeMemex = join(project, "fake-memex.mjs");
+  writeFileSync(fakeMemex, "console.log('9.9.9-test');\n", "utf8");
+  assert.equal(await main(["init", project], capture().io), 0);
+
+  const previous = process.env.MS_MEMEX_CLI;
+  process.env.MS_MEMEX_CLI = fakeMemex;
+  try {
+    const captured = capture();
+    assert.equal(await main(["doctor", project], captured.io), 0);
+    assert.match(captured.stdout(), /9\.9\.9-test \(MS_MEMEX_CLI\)/);
+  } finally {
+    if (previous === undefined) delete process.env.MS_MEMEX_CLI;
+    else process.env.MS_MEMEX_CLI = previous;
+  }
 });

@@ -14,6 +14,7 @@ import { spawnSync } from "node:child_process";
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const templateRoot = join(packageRoot, "templates", "project-instance", ".multi-silicon");
 const frameworkVersion = "0.1.0";
+const memexPackagePath = join("@touchskyer", "memex", "dist", "cli.js");
 
 const help = `Multi-Silicon CLI
 
@@ -66,6 +67,65 @@ function copyMissing(source, destination) {
 
 function git(command, cwd) {
   return spawnSync("git", command, { cwd, encoding: "utf8", windowsHide: true });
+}
+
+function run(command, args, options = {}) {
+  return spawnSync(command, args, {
+    encoding: "utf8",
+    windowsHide: true,
+    ...options,
+  });
+}
+
+function resolveMemexRunner() {
+  const roots = new Set();
+  if (process.env.MS_MEMEX_CLI) {
+    const explicit = resolve(process.env.MS_MEMEX_CLI);
+    if (existsSync(explicit)) {
+      const version = run(process.execPath, [explicit, "--version"]);
+      if (version.status === 0) {
+        return {
+          command: process.execPath,
+          prefixArgs: [explicit],
+          version: version.stdout.trim(),
+          source: "MS_MEMEX_CLI",
+        };
+      }
+    }
+  }
+
+  const direct = run("memex", ["--version"]);
+  if (direct.status === 0) {
+    return {
+      command: "memex",
+      prefixArgs: [],
+      version: direct.stdout.trim(),
+      source: "PATH",
+    };
+  }
+
+  roots.add(join(dirname(process.execPath), "node_modules"));
+  if (process.env.APPDATA) roots.add(join(process.env.APPDATA, "npm", "node_modules"));
+
+  if (process.platform !== "win32") {
+    const npmRoot = run("npm", ["root", "--global"]);
+    if (npmRoot.status === 0 && npmRoot.stdout.trim()) roots.add(resolve(npmRoot.stdout.trim()));
+  }
+
+  for (const root of roots) {
+    const cli = join(root, memexPackagePath);
+    if (!existsSync(cli)) continue;
+    const version = run(process.execPath, [cli, "--version"]);
+    if (version.status === 0) {
+      return {
+        command: process.execPath,
+        prefixArgs: [cli],
+        version: version.stdout.trim(),
+        source: "global Node package",
+      };
+    }
+  }
+  return null;
 }
 
 function addLocalGitExclude(projectRoot) {
@@ -164,9 +224,10 @@ function doctorProject(target, io) {
     ok &&= present;
   }
 
-  const memex = spawnSync("memex", ["--version"], { encoding: "utf8", windowsHide: true });
-  const memexPresent = memex.status === 0;
-  output(`${memexPresent ? "✓" : "!"} Memex: ${memexPresent ? memex.stdout.trim() : "not found on PATH"}`, io);
+  const memex = resolveMemexRunner();
+  const memexPresent = memex !== null;
+  output(`${memexPresent ? "✓" : "✗"} Memex: ${memexPresent ? `${memex.version} (${memex.source})` : "provider not found"}`, io);
+  ok &&= memexPresent;
   return ok ? 0 : 1;
 }
 
@@ -177,7 +238,9 @@ function memoryCommand(args, target, io) {
   }
   const found = findInstance(target ?? ".");
   if (!found) return fail("no .multi-silicon project instance found", io);
-  const result = spawnSync("memex", args, {
+  const memex = resolveMemexRunner();
+  if (!memex) return fail("Memex provider not found; install @touchskyer/memex or set MS_MEMEX_CLI", io);
+  const result = spawnSync(memex.command, [...memex.prefixArgs, ...args], {
     cwd: found.projectRoot,
     env: { ...process.env, MEMEX_HOME: join(found.instance, "memory") },
     stdio: "inherit",
