@@ -6,7 +6,7 @@
 |---|---|---|
 | 0. 架构骨架 | 建立八章能力地图、公共边界与项目消费协议 | 进行中 |
 | 1. Project Instance | 交付 `ms init/status/doctor` 与 `.multi-silicon/` | 首个切片 |
-| 2. Memory Protocol | 接入 Memex，跑通 Recall → Work → Retro → Verify | 待实现 |
+| 2. Memory Protocol | 接入 Memex，跑通 Recall → Work → Retro → Verify | 首个闭环 |
 | 3. Harness | 完成条件、机械门禁和独立审查接口 | 待实现 |
 | 4. Multi-Agent | 显式角色、委派、隔离、交接与汇总 | 待实现 |
 | 5. Autonomous Run | 有预算、停止条件和人类升级机制的运行 tick | 待实现 |
@@ -22,3 +22,5 @@
 3. `ms status` 和 `ms doctor` 能识别并检查项目实例；
 4. 八章都有边界、接口和最小切片说明；
 5. 后续具体变更可以由 OpenSpec 管理。
+
+下一里程碑完成标准是：项目 Agent 能自动发现 Memory Skill 与 Memex MCP；SessionStart 能注入 Recall/Retro 协议；Stop 能对遗漏的生命周期决策补漏一次；所有项目数据与运行状态保持在本地实例边界内。

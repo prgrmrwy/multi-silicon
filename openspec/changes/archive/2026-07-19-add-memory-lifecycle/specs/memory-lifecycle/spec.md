@@ -43,3 +43,41 @@ Recall 与 Retro SHALL 由 Agent 根据 Memory Skill 执行语义判断，且 SH
 - **WHEN** 一项实质工作完成
 - **THEN** Agent 对每条候选洞见选择创建、更新或跳过
 - **AND** 对任何写入执行回读验证
+
+### Requirement: Local Agent discovery
+
+Multi-Silicon SHALL 将项目级 MCP、Skill 与 Agent 要求的规范内容保存在 `.multi-silicon`，并 SHALL 只通过本地 Git 排除的薄桥接接入 Agent 宿主。
+
+#### Scenario: Initialize an unconfigured project
+
+- **WHEN** 用户在没有冲突发现路径的 Git 项目执行 `ms init`
+- **THEN** Codex 与 Claude 能发现项目级 Memex MCP、Memory Skill 与生命周期 Hook
+- **AND** `git status` 不显示实例或桥接内容
+
+#### Scenario: Discovery path belongs to the project
+
+- **WHEN** 所需桥接路径已被 Git 跟踪、其父路径不是目录或包含不同本地内容
+- **THEN** 初始化明确报告冲突；必需 MCP/Hook 冲突失败，可选 Skill 冲突退化为 Hook 注入
+- **AND** 不覆盖目标项目的文件
+
+### Requirement: Observable lifecycle completion
+
+Multi-Silicon SHALL 为 Agent 会话记录 Recall 与 Retro 决策，并 SHOULD 在首次 Stop 遗漏时要求 Agent 继续完成生命周期。
+
+#### Scenario: Continue an existing Agent session
+
+- **WHEN** 用户在同一 Agent 会话提交下一回合任务
+- **THEN** 系统清空上一回合的 Recall/Retro 完成状态
+- **AND** 新回合必须独立完成生命周期决策
+
+#### Scenario: Agent omits Retro
+
+- **WHEN** Agent 首次尝试结束会话且尚未记录 Retro
+- **THEN** Stop Hook 返回具体的补漏提示
+- **AND** Agent 可以记录创建、更新或跳过后正常结束
+
+#### Scenario: Agent repeatedly omits lifecycle decisions
+
+- **WHEN** Stop Hook 已经提示一次但决策仍然缺失
+- **THEN** 系统告警并放行
+- **AND** 不形成无限 Hook 循环

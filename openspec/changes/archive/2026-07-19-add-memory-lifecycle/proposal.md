@@ -9,6 +9,8 @@
 - 将 `.multi-silicon/memory` 固定为项目级 `MEMEX_HOME`。
 - 由 `ms memory` 委托 Memex 的搜索、读取、链接和健康检查。
 - 由 Agent Skill 承担 Recall 与 Retro 的语义判断，不伪装成 Memex 原生命令。
+- 由 `ms init` 将 MCP、Skill 和 Agent 生命周期要求收拢到 `.multi-silicon/integrations`，并生成宿主发现所需的本地薄桥接。
+- 使用 SessionStart 注入协议，使用 Stop Hook 对遗漏的 Recall/Retro 决策补漏一次。
 - 增加跨平台检测、错误报告和端到端验证。
 
 ## User Value
@@ -24,4 +26,4 @@
 ## Impact
 
 - Affected specs: `memory-lifecycle`（新增）
-- Affected code: `ms memory`、项目模板、Memory Skill、诊断与测试
+- Affected code: `ms memory`、`ms lifecycle`、项目模板、Agent 桥接、Memory Skill、诊断与测试

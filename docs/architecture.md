@@ -11,6 +11,7 @@ flowchart TB
     H["Methodology Home<br/>multi-silicon"]
     CLI["Protocol Layer<br/>ms CLI"]
     I["Project Instance<br/>.multi-silicon/"]
+    B["Local discovery bridges<br/>.codex / .agents / .claude / .mcp.json"]
     P["Actual Project<br/>source and tests"]
     O["OpenSpec<br/>change specifications"]
     M["Memex<br/>durable memory"]
@@ -19,6 +20,8 @@ flowchart TB
 
     H --> CLI
     CLI --> I
+    I --> B
+    B --> A
     I <--> P
     I <--> M
     I <--> O
@@ -44,10 +47,10 @@ flowchart TB
 
 - 项目级配置；
 - Memex Memory；
-- 项目局部 Skill 与 Harness；
+- Agent 要求、MCP、项目局部 Skill 与 Harness 的规范来源；
 - 未来多 Agent 和自主运行的状态。
 
-默认采用本地模式，并加入目标 Git 仓库的本地 exclude。
+默认采用本地模式，并加入目标 Git 仓库的本地 exclude。由于 Codex 与 Claude 只在各自约定目录发现项目配置，`ms init` 会生成少量本地薄桥接；规范内容仍以 `.multi-silicon/` 为准。MCP/Hook 必需桥接若已被项目跟踪或包含不同内容，初始化会明确失败；Skill 目录桥接冲突时保留项目文件并退化为 Hook 注入，任何情况都不覆盖项目配置。
 
 ## 三种知识状态
 
@@ -82,9 +85,10 @@ ms upgrade
 
 ```text
 ms memory ...
+ms lifecycle ...
 ms harness ...
 ms agent ...
 ms run ...
 ```
 
-当前实现只承诺 `init`、`status` 和 `doctor`。其余命令按照 [路线图](../ROADMAP.md) 渐进交付。
+当前实现承诺 `init`、`status`、`doctor`、`memory` 与内部生命周期协议 `lifecycle`。其余命令按照 [路线图](../ROADMAP.md) 渐进交付。

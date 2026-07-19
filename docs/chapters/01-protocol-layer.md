@@ -10,10 +10,10 @@
 - 一级命令只保存跨能力操作，增长型功能进入能力域。
 - 人类输出清晰可读，Agent 和脚本接口最终应支持稳定结构化输出。
 
-## 最小切片
+## 当前切片
 
-交付 `ms init [path]`、`ms status [path]` 与 `ms doctor [path]`，建立 `.multi-silicon/` 项目实例。
+已交付 `ms init [path]`、`ms status [path]` 与 `ms doctor [path]`，建立 `.multi-silicon/` 项目实例；`ms memory` 提供 Memex 存储协议，`ms lifecycle` 提供 Agent Recall/Retro 状态协议。
 
 ## 状态
 
-首个切片实现中；版本协商、JSON 输出和升级协议待实现。
+Project Instance 与 Memory 首个闭环已实现；版本协商、稳定 JSON 输出和升级协议待实现。

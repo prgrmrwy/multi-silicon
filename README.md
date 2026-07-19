@@ -19,11 +19,14 @@ npm link
 ms init <project-path>
 ms status <project-path>
 ms doctor <project-path>
+ms memory <memex-command>
 ```
 
-`ms init` 默认采用本地模式：在目标项目创建 `.multi-silicon/`，并将它加入目标 Git 仓库的本地 exclude，不修改团队共享的 `.gitignore`。
+`ms init` 默认采用本地侧挂模式：在目标项目创建 `.multi-silicon/`，并为 Codex 与 Claude 生成项目级 MCP、Skill 和生命周期 Hook 的薄桥接。实例与桥接只写入目标 Git 仓库的本地 exclude，不修改团队共享的 `.gitignore` 或已跟踪的 Agent 配置。
 
 Memory 第一阶段直接采用 [Memex](https://github.com/touchskyer/memex)，Multi-Silicon 不自研卡片存储引擎。
+
+会话开始及每个用户回合提交时，Hook 会向 Agent 注入或重置 Recall/Retro 协议；任务收尾遗漏生命周期决策时，Stop Hook 会补漏一次。Hook 可以被宿主禁用或绕过，因此它是工作模式约束，不是权限安全边界。
 
 ## 能力地图
 
