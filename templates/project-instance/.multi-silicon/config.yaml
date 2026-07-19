@@ -1,0 +1,12 @@
+schemaVersion: 1
+frameworkVersion: "{{FRAMEWORK_VERSION}}"
+
+capabilities:
+  memory: true
+  harness: false
+  multiAgent: false
+  autonomousOperation: false
+
+dataPolicy:
+  mode: local
+  allowPublicPromotion: false

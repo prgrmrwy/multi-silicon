@@ -1,0 +1,25 @@
+{
+  "name": "@prgrmrwy/multi-silicon",
+  "version": "0.1.0",
+  "description": "A methodology home and CLI for progressively building a bounded Silicon Team workflow.",
+  "type": "module",
+  "bin": {
+    "ms": "./bin/ms.mjs"
+  },
+  "files": [
+    "bin",
+    "src",
+    "templates",
+    "skills",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "check:public": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-public-content.ps1"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "license": "MIT"
+}

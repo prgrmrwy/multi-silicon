@@ -1,0 +1,35 @@
+schema: spec-driven
+
+context: |
+  Multi-Silicon 是公共 Methodology Home。它以文章体系建立完整能力骨架，
+  通过 ms CLI 被实际项目渐进消费。项目实例位于目标项目的 .multi-silicon/，
+  任何可识别的实际项目信息都不得进入本仓库。
+  Multi-Silicon 管总体方法与路线图，OpenSpec 管具体变更，Memex 管长期记忆。
+
+rules:
+  proposal:
+    - 明确说明用户价值、公共边界和非目标。
+    - 不得包含实际项目名称、内部路径或专有事实。
+  specs:
+    - 使用可验证的行为要求，不把计划描述为已实现。
+  tasks:
+    - 每项任务必须可以独立验证。
+
+# Project context (optional)
+# This is shown to AI when creating artifacts.
+# Add your tech stack, conventions, style guides, domain knowledge, etc.
+# Example:
+#   context: |
+#     Tech stack: TypeScript, React, Node.js
+#     We use conventional commits
+#     Domain: e-commerce platform
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always include a "Non-goals" section
+#     tasks:
+#       - Break tasks into chunks of max 2 hours

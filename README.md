@@ -1,0 +1,38 @@
+# Multi-Silicon
+
+Multi-Silicon 是一套面向真实软件工作的渐进式 Silicon Team 工作模式。
+
+项目以 Silicon Team 系列文章为第一轮架构骨架，但目标不是复刻文章中的某个工具，而是持续生长出一套能够被实际项目消费、验证和改进的方法论与运行能力。
+
+## 两个独立空间
+
+- **Methodology Home**：本仓库，保存通用架构、Protocol、Skill、Harness 模板与 `ms` CLI。
+- **Project Instance**：实际项目中的 `.multi-silicon/`，保存项目配置、Memory、运行状态与本地扩展。
+
+具体项目的名称、源码事实、卡片和运行数据不得进入本公共仓库。
+
+## 当前可用切片
+
+```powershell
+npm install
+npm link
+ms init <project-path>
+ms status <project-path>
+ms doctor <project-path>
+```
+
+`ms init` 默认采用本地模式：在目标项目创建 `.multi-silicon/`，并将它加入目标 Git 仓库的本地 exclude，不修改团队共享的 `.gitignore`。
+
+Memory 第一阶段直接采用 [Memex](https://github.com/touchskyer/memex)，Multi-Silicon 不自研卡片存储引擎。
+
+## 能力地图
+
+完整架构从八个主题渐进展开：团队目标、CLI Protocol、Harness、多 Agent 协作、有边界自治、治理、运行可靠性与知识晋升。各主题入口见 [章节地图](docs/chapters/README.md)，实施顺序见 [路线图](ROADMAP.md)。
+
+具体变更使用 OpenSpec 管理；长期经验使用 Memex 管理。二者都服务于 Multi-Silicon，而不取代它的总体架构。
+
+## 数据边界
+
+公共仓库只接受无法识别具体业务项目的通用内容。真实项目经验只有经过验证、脱敏和泛化后，才能晋升为公共 Protocol、Skill 或 Harness。
+
+详细说明见 [总体架构](docs/architecture.md) 与 [项目集成](docs/integration/project-instance.md)。

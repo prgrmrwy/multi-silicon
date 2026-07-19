@@ -1,0 +1,6 @@
+{
+  "nestedSlugs": false,
+  "experimental": {
+    "agenticMemory": true
+  }
+}

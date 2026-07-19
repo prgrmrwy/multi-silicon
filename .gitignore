@@ -1,0 +1,20 @@
+# Local project instance and Memory
+/.multi-silicon/
+/cards/
+/archive/
+/.memexrc
+/.memex/
+/.last-organize
+/.sync.json
+
+# Local Codex adaptation from the pre-public workspace
+/.agents/
+/scripts/memex.ps1
+
+# Dependencies and generated output
+/node_modules/
+/coverage/
+/dist/
+
+# Local-only public-content deny list
+/.public-deny-patterns.local

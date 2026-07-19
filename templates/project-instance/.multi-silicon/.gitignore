@@ -1,0 +1,7 @@
+runs/*
+!runs/.gitkeep
+state/*
+!state/.gitkeep
+memory/.memex/
+memory/.last-organize
+memory/.sync.json

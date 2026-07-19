@@ -1,0 +1,4 @@
+interface:
+  display_name: "Multi-Silicon Memory"
+  short_description: "使用 Memex 召回并沉淀项目长期知识"
+  default_prompt: "使用 $multi-silicon-memory 从当前项目实例召回相关知识，完成任务，并执行记忆决策。"
