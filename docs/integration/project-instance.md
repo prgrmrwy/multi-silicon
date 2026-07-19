@@ -39,15 +39,15 @@ actual-project/
 
 ## Agent 生命周期
 
-SessionStart Hook 在每个会话开始或恢复时注入项目级 Memory 协议，UserPromptSubmit Hook 在每个用户回合重新打开 Recall/Retro 状态。Agent 需要：
+SessionStart Hook 在每个会话开始或恢复时注入项目级 Memory 协议，UserPromptSubmit Hook 在每个用户回合重新注入 Recall/Retro 约束。Agent 需要：
 
-1. 在实质工作前判断是否 Recall，并记录 `performed` 或 `skipped`；
+1. 在实质工作前判断是否 Recall；历史无助于当前任务时可以明确跳过；
 2. 使用当前源码、测试与实时证据校验记忆；
-3. 收尾时对候选洞见记录 `create`、`update` 或 `skip`；
-4. 创建或更新卡片后回读验证，才能记录 `--verified`；
+3. 收尾时对候选洞见选择 `create`、`update` 或 `skip`；
+4. 创建或更新卡片后回读验证；
 5. 在最终回复中报告简短的记忆决策。
 
-Stop Hook 会在首次遗漏 Recall/Retro 记录时要求 Agent 继续处理。为防止无限循环，第二次仍遗漏时只告警并放行。宿主还可能禁用 Hook、拒绝信任项目配置或直接绕过协议，因此这套机制是强工作流约束，不是不可绕过的安全控制。真正的强制治理应在后续 Harness 阶段由机械门禁承担。
+Stop Hook 在首次结束时提供一次 Retro 补漏机会，第二次结束时放行以防无限循环。Memory/Protocol 阶段不要求 Agent 通过 shell 提交完成凭证；宿主还可能禁用 Hook、拒绝信任项目配置或直接绕过协议，因此这套机制是强工作流约束，不是不可绕过的安全控制。审计率、合规指标与不可跳过的完成凭证属于后续 Harness 阶段。
 
 Codex Stop 使用宿主要求的 JSON continuation 协议（`decision: block`）；Claude Stop 使用退出码 2 与 stderr。两个适配共享同一生命周期状态，但保持各自宿主的 Hook 输出格式。
 

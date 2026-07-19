@@ -26,7 +26,9 @@ ms memory <memex-command>
 
 Memory 第一阶段直接采用 [Memex](https://github.com/touchskyer/memex)，Multi-Silicon 不自研卡片存储引擎。
 
-会话开始及每个用户回合提交时，Hook 会向 Agent 注入或重置 Recall/Retro 协议；任务收尾遗漏生命周期决策时，Stop Hook 会补漏一次。Hook 可以被宿主禁用或绕过，因此它是工作模式约束，不是权限安全边界。
+会话开始及每个用户回合提交时，Hook 会向 Agent 注入 Recall/Retro 协议；任务收尾时，Stop Hook 会提供一次 Retro 补漏机会。Memory/Protocol 阶段不要求 Agent 通过 shell 提交机械凭证；Hook 可以被宿主禁用或绕过，因此它是工作模式约束，不是权限安全边界。不可跳过的凭证与合规门禁属于后续 Harness。
+
+当前能力进度与跨机器接续说明见 [PROGRESS](PROGRESS.md)。
 
 ## 能力地图
 

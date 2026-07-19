@@ -499,13 +499,11 @@ function lifecycleContext(sessionId) {
   return [
     "Multi-Silicon Memory lifecycle is active for this project.",
     `Session: ${sessionId}`,
-    "Before substantive work, decide whether history can change the approach. Run 1-3 focused Memex queries when useful, then record the decision:",
-    `  ms lifecycle recall --session ${sessionId} --action performed|skipped --reason "<reason>"`,
+    "Before substantive work, decide whether history can change the approach. Run 1-3 focused Memex queries when useful; otherwise explicitly treat Recall as skipped.",
     "Use the project MCP provider multi_silicon_memex when available, otherwise use ms memory. Never use a Memex provider configured for another project.",
     "Treat memory as context; current source, tests, project rules, and live evidence win.",
-    "Before the final response, perform Retro. Search/read candidates before create or update, write one durable insight per card, and reread any write. Then record exactly one outcome:",
-    `  ms lifecycle retro --session ${sessionId} --action create|update|skip --reason "<reason>" [--verified]`,
-    "The --verified flag is required after create or update. End the final response with: 记忆：创建|更新|跳过 — <原因>",
+    "Before the final response, perform Retro. Search/read candidates before create or update, write one durable insight per card, and reread any write. If no durable insight exists, choose skip.",
+    "End the final response with: 记忆：创建|更新|跳过 — <原因>. Memory/Protocol does not require an Agent-side shell receipt; mechanical attestation belongs to Harness.",
   ].join("\n");
 }
 
@@ -545,10 +543,7 @@ function lifecycleHook(args, io) {
   }
 
   const state = readSession(found.instance, sessionId);
-  const missing = [];
-  if (!state?.recall) missing.push("Recall decision");
-  if (!state?.retro) missing.push("Retro decision");
-  if (missing.length === 0) return 0;
+  if (state?.retro) return 0;
 
   const nextState = state ?? {
     sessionId,
@@ -561,13 +556,13 @@ function lifecycleHook(args, io) {
   nextState.stopPrompts += 1;
   writeSession(found.instance, nextState);
   if (nextState.stopPrompts > 1 || input.stop_hook_active === true) {
-    const warning = `Multi-Silicon allowed stop after one retry; unresolved: ${missing.join(", ")}.`;
+    const warning = "Multi-Silicon allowed stop after one Retro reminder; Harness-level attestation is not enabled.";
     if (agent === "codex") output(JSON.stringify({ systemMessage: warning }), io);
     else io.stderr.write(`${warning}\n`);
     return 0;
   }
 
-  const prompt = `Multi-Silicon completion gate: ${missing.join(" and ")} is missing for session ${sessionId}. Complete the lifecycle commands shown at SessionStart, then finish the response.`;
+  const prompt = `Multi-Silicon completion reminder for session ${sessionId}: perform Retro before finishing. Use project Memory to create or update only durable knowledge; otherwise choose skip. End the response with 记忆：创建|更新|跳过 — <原因>. No lifecycle shell receipt is required.`;
   if (agent === "claude") {
     io.stderr.write(`${prompt}\n`);
     return 2;

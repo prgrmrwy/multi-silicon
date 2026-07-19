@@ -12,8 +12,8 @@
 
 ## 当前切片
 
-已交付 `ms init [path]`、`ms status [path]` 与 `ms doctor [path]`，建立 `.multi-silicon/` 项目实例；`ms memory` 提供 Memex 存储协议，`ms lifecycle` 提供 Agent Recall/Retro 状态协议。
+已交付 `ms init [path]`、`ms status [path]` 与 `ms doctor [path]`，建立 `.multi-silicon/` 项目实例；`ms memory` 提供 Memex 存储协议，`ms lifecycle` 提供宿主 Hook 适配与可选诊断状态。
 
 ## 状态
 
-Project Instance 与 Memory 首个闭环已实现；版本协商、稳定 JSON 输出和升级协议待实现。
+Project Instance 与 Hook-first Memory 首个闭环已实现；版本协商、稳定 JSON 输出和升级协议待实现。

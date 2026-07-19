@@ -17,4 +17,4 @@
 
 ## 状态
 
-Memex 已选定为提供者；项目级集成待实现。
+Memory MVP 已收口：项目实例能够发现 Memex MCP 与 Memory Skill，宿主 Hook 能在任务前后注入 Recall/Retro 约束并提供一次 Retro 补漏，项目数据保持在本地边界。召回价值度量与“卡片 → 模式 → Skill → Harness → 公共知识”的晋升机制待后续真实任务积累证据后实现。

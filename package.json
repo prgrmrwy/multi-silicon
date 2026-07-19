@@ -11,7 +11,10 @@
     "src",
     "templates",
     "skills",
+    "docs",
     "README.md",
+    "ROADMAP.md",
+    "PROGRESS.md",
     "LICENSE"
   ],
   "scripts": {

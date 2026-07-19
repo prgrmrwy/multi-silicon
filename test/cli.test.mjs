@@ -137,7 +137,7 @@ else writeFileSync(process.env.MS_PROVIDER_CAPTURE, JSON.stringify({ home: proce
   }
 });
 
-test("lifecycle hooks surface Recall and gate a missing Retro once", async () => {
+test("lifecycle hooks surface Recall and offer one Hook-first Retro reminder", async () => {
   const project = mkdtempSync(join(tmpdir(), "ms-project-"));
   assert.equal(await main(["init", project], capture().io), 0);
   const sessionId = "test-session";
@@ -145,13 +145,9 @@ test("lifecycle hooks surface Recall and gate a missing Retro once", async () =>
   assert.equal(await main([
     "lifecycle", "hook", "session-start", "--agent", "codex", "--project", project,
   ], start.io), 0);
-  assert.match(start.stdout(), /ms lifecycle recall/);
-  assert.match(start.stdout(), /ms lifecycle retro/);
-
-  assert.equal(await main([
-    "lifecycle", "recall", "--project", project, "--session", sessionId,
-    "--action", "skipped", "--reason", "no relevant history",
-  ], capture().io), 0);
+  assert.match(start.stdout(), /multi_silicon_memex/);
+  assert.match(start.stdout(), /does not require an Agent-side shell receipt/);
+  assert.doesNotMatch(start.stdout(), /ms lifecycle recall/);
 
   const firstStop = capture(JSON.stringify({ session_id: sessionId }));
   assert.equal(await main([
@@ -159,18 +155,16 @@ test("lifecycle hooks surface Recall and gate a missing Retro once", async () =>
   ], firstStop.io), 0);
   assert.deepEqual(JSON.parse(firstStop.stdout()), {
     decision: "block",
-    reason: `Multi-Silicon completion gate: Retro decision is missing for session ${sessionId}. Complete the lifecycle commands shown at SessionStart, then finish the response.`,
+    reason: `Multi-Silicon completion reminder for session ${sessionId}: perform Retro before finishing. Use project Memory to create or update only durable knowledge; otherwise choose skip. End the response with 记忆：创建|更新|跳过 — <原因>. No lifecycle shell receipt is required.`,
   });
 
-  assert.equal(await main([
-    "lifecycle", "retro", "--project", project, "--session", sessionId,
-    "--action", "skip", "--reason", "no durable insight",
-  ], capture().io), 0);
-  const finalStop = capture(JSON.stringify({ session_id: sessionId }));
+  const finalStop = capture(JSON.stringify({ session_id: sessionId, stop_hook_active: true }));
   assert.equal(await main([
     "lifecycle", "hook", "stop", "--agent", "codex", "--project", project,
   ], finalStop.io), 0);
-  assert.equal(finalStop.stdout(), "");
+  assert.deepEqual(JSON.parse(finalStop.stdout()), {
+    systemMessage: "Multi-Silicon allowed stop after one Retro reminder; Harness-level attestation is not enabled.",
+  });
 
   const nextTurn = capture(JSON.stringify({ session_id: sessionId, turn_id: "turn-2" }));
   assert.equal(await main([
@@ -178,12 +172,13 @@ test("lifecycle hooks surface Recall and gate a missing Retro once", async () =>
   ], nextTurn.io), 0);
   const nextStop = capture(JSON.stringify({ session_id: sessionId, turn_id: "turn-2" }));
   assert.equal(await main([
+    "lifecycle", "retro", "--project", project, "--session", sessionId,
+    "--action", "skip", "--reason", "nothing durable",
+  ], capture().io), 0);
+  assert.equal(await main([
     "lifecycle", "hook", "stop", "--agent", "codex", "--project", project,
   ], nextStop.io), 0);
-  assert.deepEqual(JSON.parse(nextStop.stdout()), {
-    decision: "block",
-    reason: `Multi-Silicon completion gate: Recall decision and Retro decision is missing for session ${sessionId}. Complete the lifecycle commands shown at SessionStart, then finish the response.`,
-  });
+  assert.equal(nextStop.stdout(), "");
 });
 
 test("Retro create and update require a declared read-back verification", async () => {

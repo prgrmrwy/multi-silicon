@@ -61,24 +61,30 @@ Multi-Silicon SHALL 将项目级 MCP、Skill 与 Agent 要求的规范内容保�
 - **THEN** 初始化明确报告冲突；必需 MCP/Hook 冲突失败，可选 Skill 冲突退化为 Hook 注入
 - **AND** 不覆盖目标项目的文件
 
-### Requirement: Observable lifecycle completion
+### Requirement: Hook-first lifecycle completion
 
-Multi-Silicon SHALL 为 Agent 会话记录 Recall 与 Retro 决策，并 SHOULD 在首次 Stop 遗漏时要求 Agent 继续完成生命周期。
+Multi-Silicon SHALL 在 Agent 会话与用户回合边界注入 Recall/Retro 协议，并 SHOULD 在首次 Stop 时提供一次 Retro 补漏机会。Memory/Protocol 阶段 SHALL NOT 要求 Agent 通过 shell 提交机械完成凭证。
 
 #### Scenario: Continue an existing Agent session
 
 - **WHEN** 用户在同一 Agent 会话提交下一回合任务
-- **THEN** 系统清空上一回合的 Recall/Retro 完成状态
-- **AND** 新回合必须独立完成生命周期决策
+- **THEN** 系统重新注入 Recall/Retro 协议
+- **AND** 新回合独立作出生命周期决策
 
-#### Scenario: Agent omits Retro
+#### Scenario: Agent reaches Stop
 
-- **WHEN** Agent 首次尝试结束会话且尚未记录 Retro
-- **THEN** Stop Hook 返回具体的补漏提示
-- **AND** Agent 可以记录创建、更新或跳过后正常结束
+- **WHEN** Agent 首次尝试结束当前回合
+- **THEN** Stop Hook 返回具体的 Retro 补漏提示
+- **AND** Agent 可以创建、更新或跳过后再次结束
 
-#### Scenario: Agent repeatedly omits lifecycle decisions
+#### Scenario: Agent finishes after the reminder
 
-- **WHEN** Stop Hook 已经提示一次但决策仍然缺失
-- **THEN** 系统告警并放行
+- **WHEN** Stop Hook 已经提供一次 Retro 提示
+- **THEN** 系统放行下一次 Stop
 - **AND** 不形成无限 Hook 循环
+
+#### Scenario: Mechanical attestation is requested
+
+- **WHEN** 项目要求不可跳过的完成凭证、审计率或合规指标
+- **THEN** 该能力进入 Harness 设计
+- **AND** Memory MVP 不通过新增 lifecycle MCP 或 Agent shell receipt 提前承担机械门禁
